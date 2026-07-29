@@ -1,19 +1,32 @@
 import requests
 from config import BOT_TOKEN, CHAT_ID
 
+session = requests.Session()
+
 
 def send_message(message):
-    """
-    ارسال پیام به تلگرام
-    """
 
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
-    data = {
+    payload = {
         "chat_id": CHAT_ID,
         "text": message
     }
 
-    response = requests.post(url, data=data)
+    try:
 
-    return response.json()
+        response = session.post(
+            url,
+            data=payload,
+            timeout=10
+        )
+
+        response.raise_for_status()
+
+        return True
+
+    except requests.exceptions.RequestException as e:
+
+        print(f"Telegram Error: {e}")
+
+        return False
