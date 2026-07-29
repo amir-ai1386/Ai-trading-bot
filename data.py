@@ -1,6 +1,8 @@
 import requests
 from config import BASE_URL
 
+session = requests.Session()
+
 
 def get_klines(symbol, interval, limit=200):
     """
@@ -12,12 +14,23 @@ def get_klines(symbol, interval, limit=200):
     params = {
         "symbol": symbol,
         "interval": interval,
-        "limit": limit
+        "limit": limit,
     }
 
-    response = requests.get(url, params=params)
+    try:
 
-    if response.status_code == 200:
+        response = session.get(
+            url,
+            params=params,
+            timeout=10
+        )
+
+        response.raise_for_status()
+
         return response.json()
 
-    return None
+    except requests.exceptions.RequestException as e:
+
+        print(f"Binance Error ({symbol}-{interval}) : {e}")
+
+        return None
